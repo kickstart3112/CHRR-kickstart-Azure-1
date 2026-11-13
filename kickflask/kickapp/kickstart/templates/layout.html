@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    {% block title %}
+    {% if title %}
+        <title>{{ title }}-kickstart</title>
+    {% else %}
+        <title>Azure</title>
+    {% endif %}
+    {% endblock %}
+</head>
+<body>
+    <!-- Start a container that holds a navigation an  page content -->
+    <div class="dashboard">
+        <!-- Create a navigation pane using your existing sidebar CSS. -->
+        <!-- aria-label gives this navigation an accessible name. -->
+        <nav class="sidebar" aria-label="Main navigation">
+            <!-- Leave this empty for now; we will add links later. -->
+             <div class="brand">
+                <h1 class="brand-name">KickProject</h1>
+                <p>From Azure Patterns to working solutions, in minutes.</p>
+             </div>
+            <div class="sidebar-nav">
+                <a class="nav-item" href="{{ url_for('home') }}">Home</a>
+                <a class="nav-item" href="{{ url_for('about') }}">About</a>
+            </div>
+        </nav>
+
+        <!-- Use existing CSS to position page content beside the sidebar. -->
+        <main class="main-content">
+
+            {# Start the area that child templates can fill with content. #}
+            {% block content %}
+
+            {# End the replaceable content area. #}
+            {% endblock %}
+
+        </main> <!-- Close the main content area. -->
+
+    </div> <!-- Close the dashboard container. -->
+</body>
+</html>

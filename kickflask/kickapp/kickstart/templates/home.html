@@ -1,0 +1,68 @@
+{% extends "layout.html" %}
+{% block title %}
+    <title>kickhome</title>
+{% endblock %}
+{% block content %}
+    <header class="topbar">
+    <!-- Apply the existing search-box styles to the search field container. -->
+        <div class="search-box">
+            <!-- Create a search input with a name, hint, and accessible label. -->
+             <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="18"
+                height="18"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                aria-hidden="true"
+            >
+                <!-- Draw the circular lens, centered at coordinates 11,11 with radius 7. -->
+                <circle cx="11" cy="11" r="7"></circle>
+
+                <!-- Draw the handle from the lens toward the bottom-right corner. -->
+                <path d="M16 16 L21 21"></path>
+            </svg>
+            <input
+                type="search"
+                name="search"
+                placeholder="Search Azure patterns(e.g. AKS, etc.)"
+                aria-label="Search projects"
+            > <!-- Finish the input element; inputs do not need closing tags. -->
+        </div> <!-- Close the search field container. -->
+    </header> <!-- Close the top row. -->
+    <h3> Azure Architecture & Implementation Patterns </h3> 
+    <div class="category-tabs">
+        {% for value, label in [
+            ('all', 'All'),
+            ('compute', 'Compute'),
+            ('databases', 'Databases'),
+            ('ai', 'AI / ML')
+        ] %}
+            <a
+                href="{{ url_for('home', category=value) }}"
+                class="category-tab {{ 'active' if selected_category == value else '' }}"
+                {% if selected_category == value %}aria-current="page"{% endif %}
+            >
+                {{ label }}
+            </a>
+        {% endfor %}
+    </div>
+    <div class="pattern-list">
+        {% for pattern in patterns %}
+            <article class="pattern-card catalog-pattern">
+                <h3 class="pattern-title">{{ pattern.name }}</h3>
+            </article>
+        {% else %}
+            <p>No patterns found.</p>
+        {% endfor %}
+    </div>
+
+    <!-- <form method="POST" action="{{ url_for('home') }}">
+        <label>Project Name:</label>
+        <input type="text"
+            name="project_name"
+            placeholder="Name of the project"
+            required>
+    </form> -->
+{% endblock %}
