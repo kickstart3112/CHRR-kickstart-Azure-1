@@ -1,4 +1,4 @@
-from flask import render_template, request
+from flask import render_template, request, abort
 from kickstart import app
 
 patterns = [
@@ -14,7 +14,7 @@ patterns = [
             "and a Flask API using Microsoft Entra External ID."
         ),
         "tags": ["React", "Flask", "Microsoft Entra"],
-        "icon": "",
+        "icon": "🔐",
         "fields": [
             ("tenent_id", "External Tenent ID"),
             ("frontend_client_id", "React Applications Client ID"),
@@ -34,7 +34,7 @@ def home():
 
     # All includes every patterns; other values filter by category.
     visible_patterns = [
-        patterns
+        pattern
         for pattern in patterns
         if category == "all" or pattern["category"] == category
     ]
@@ -54,7 +54,7 @@ def home():
     submitted = False
 
     # POST runs when the user presses "Review details"
-    if requested.method == "POST":
+    if request.method == "POST":
         # Submitting requires a selected Patterns
         if selected_pattern is None:
             abort(400)
@@ -66,14 +66,21 @@ def home():
             # Strip() removes accidental spaces at either end.
             values[field_name] = request.form.get(field_name, "").strip()
             # Validate required values in the server as well as in the HTML.
-            if not values(field_name):
+            if not values[field_name]:
                 errors.append(f"{label} is required.")
         # This confirms basic completeness, not azure deployment validity
         submitted = not errors
+    return render_template(
+        "home.html",
+        patterns=visible_patterns,
+        selected_category=category,
+        selected_pattern=selected_pattern,
+        common_fields=common_fields,
+        values=values,
+        errors=errors,
+        submitted=submitted
+    )
 
-
-        
-        
 @app.route("/about")
 def about():
     return render_template("about.html")

@@ -1,0 +1,116 @@
+{# This template is included only when a pattern is selected. #}
+<aside class="deployment-panel" aria-labelledby="configuration-title">
+
+    {# Removing the pattern parameter closes the panel. #}
+    <a
+        class="back-link"
+        href="{{ url_for('home', category=selected_category) }}"
+    >
+        ← Back to catalog
+    </a>
+
+    <!-- Display the selected pattern's icon, name, and description. -->
+    <div class="deployment-heading">
+        <div class="pattern-icon" aria-hidden="true">
+            {{ selected_pattern.icon }}
+        </div>
+
+        <div>
+            <h2 id="configuration-title">
+                {{ selected_pattern.name }}
+            </h2>
+
+            <p>{{ selected_pattern.description }}</p>
+        </div>
+    </div>
+
+    <!-- Display server-side validation errors after an invalid submission. -->
+    {% if errors %}
+        <div class="configuration-message configuration-error" role="alert">
+            <p>Please complete these details:</p>
+
+            <ul>
+                {% for error in errors %}
+                    <li>{{ error }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+    {% endif %}
+
+    <!-- Confirm that the server received all required values. -->
+    {% if submitted %}
+        <div class="configuration-message configuration-success" role="status">
+            Details received for {{ values.project_name }}.
+            No files have been generated yet.
+        </div>
+    {% endif %}
+
+    <!-- POST sends the inputs to home() while keeping the selected pattern. -->
+    <form
+        class="deployment-form"
+        method="post"
+        action="{{ url_for(
+            'home',
+            category=selected_category,
+            pattern=selected_pattern.id
+        ) }}"
+    >
+        <h3>Provide Deployment Details</h3>
+
+        <p class="form-description">
+            Complete the shared and pattern-specific settings below.
+        </p>
+
+        {# Render shared fields followed by this pattern's own fields. #}
+        {% for field_name, label in common_fields + selected_pattern.fields %}
+            <div class="form-field">
+
+                <!-- Matching for/id values associate each label and input. -->
+                <label for="{{ field_name }}">
+                    {{ label }}
+                    <span class="required" aria-hidden="true">*</span>
+                </label>
+
+                <div class="field-control">
+                    <!--
+                        name becomes the request.form key in Python.
+                        value preserves submitted text after a page reload.
+                        required enables browser-side completeness checking.
+                    -->
+                    <input
+                        id="{{ field_name }}"
+                        name="{{ field_name }}"
+                        type="text"
+                        value="{{ values.get(field_name, '') }}"
+                        required
+                    >
+                </div>
+            </div>
+        {% endfor %}
+        <!-- this box keeps our backend question and its answers together. -->
+        <fieldset>
+            <!-- This gives a box a short title. -->
+            <legend>Terraform BaCkend Resoruce GrouSP</legend>
+            
+        </fieldset>
+
+        <div class="form-actions">
+            <!-- A fresh GET clears entered values and confirmation messages. -->
+            <a
+                class="btn"
+                href="{{ url_for(
+                    'home',
+                    category=selected_category,
+                    pattern=selected_pattern.id
+                ) }}"
+            >
+                Reset
+            </a>
+
+            <!-- Submits the form to Flask for validation. -->
+            <button class="btn btn-primary" type="submit">
+                Review Details →
+            </button>
+        </div>
+    </form>
+</aside>

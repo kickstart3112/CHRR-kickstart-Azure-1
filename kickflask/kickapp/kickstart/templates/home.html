@@ -1,68 +1,112 @@
 {% extends "layout.html" %}
 {% block title %}
-    <title>kickhome</title>
+<title>kickhome</title>
 {% endblock %}
 {% block content %}
-    <header class="topbar">
+<header class="topbar">
     <!-- Apply the existing search-box styles to the search field container. -->
-        <div class="search-box">
-            <!-- Create a search input with a name, hint, and accessible label. -->
-             <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="18"
-                height="18"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
-                aria-hidden="true"
-            >
-                <!-- Draw the circular lens, centered at coordinates 11,11 with radius 7. -->
-                <circle cx="11" cy="11" r="7"></circle>
+    <div class="search-box">
+        <!-- Create a search input with a name, hint, and accessible label. -->
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" stroke-width="2" aria-hidden="true">
+            <!-- Draw the circular lens, centered at coordinates 11,11 with radius 7. -->
+            <circle cx="11" cy="11" r="7"></circle>
 
-                <!-- Draw the handle from the lens toward the bottom-right corner. -->
-                <path d="M16 16 L21 21"></path>
-            </svg>
-            <input
-                type="search"
-                name="search"
-                placeholder="Search Azure patterns(e.g. AKS, etc.)"
-                aria-label="Search projects"
-            > <!-- Finish the input element; inputs do not need closing tags. -->
-        </div> <!-- Close the search field container. -->
-    </header> <!-- Close the top row. -->
-    <h3> Azure Architecture & Implementation Patterns </h3> 
-    <div class="category-tabs">
-        {% for value, label in [
+            <!-- Draw the handle from the lens toward the bottom-right corner. -->
+            <path d="M16 16 L21 21"></path>
+        </svg>
+        <input type="search" name="search" placeholder="Search Azure patterns(e.g. AKS, etc.)"
+            aria-label="Search projects"> <!-- Finish the input element; inputs do not need closing tags. -->
+    </div> <!-- Close the search field container. -->
+</header> <!-- Close the top row. -->
+<!-- <h3> Azure Architecture & Implementation Patterns </h3> -->
+<!-- Add the second column only when a pattern has been selected. -->
+<div class="catalog-workspace {{ 'has-selection' if selected_pattern else '' }}">
+
+    <!-- Left column: category controls and pattern cards. -->
+    <section class="catalog-panel" aria-labelledby="catalog-title">
+
+        <div class="panel-heading">
+            <h1 id="catalog-title">
+                Azure Architecture &amp; Implementation Patterns
+            </h1>
+        </div>
+
+        <p class="panel-description">
+            Choose a pattern, then click Kickstart to configure your project.
+        </p>
+
+        <!-- These links preserve your existing category-filter behavior. -->
+        <nav class="category-tabs" aria-label="Pattern categories">
+            {% for value, label in [
             ('all', 'All'),
             ('compute', 'Compute'),
             ('databases', 'Databases'),
             ('ai', 'AI / ML')
-        ] %}
-            <a
-                href="{{ url_for('home', category=value) }}"
-                class="category-tab {{ 'active' if selected_category == value else '' }}"
-                {% if selected_category == value %}aria-current="page"{% endif %}
-            >
+            ] %}
+            <a href="{{ url_for('home', category=value) }}"
+                class="category-tab {{ 'active' if selected_category == value else '' }}" {% if selected_category==value
+                %} aria-current="page" {% endif %}>
                 {{ label }}
             </a>
-        {% endfor %}
-    </div>
-    <div class="pattern-list">
-        {% for pattern in patterns %}
-            <article class="pattern-card catalog-pattern">
-                <h3 class="pattern-title">{{ pattern.name }}</h3>
-            </article>
-        {% else %}
-            <p>No patterns found.</p>
-        {% endfor %}
-    </div>
+            {% endfor %}
+        </nav>
 
-    <!-- <form method="POST" action="{{ url_for('home') }}">
-        <label>Project Name:</label>
-        <input type="text"
-            name="project_name"
-            placeholder="Name of the project"
-            required>
-    </form> -->
+        <!-- Flask has already filtered this collection by category. -->
+        <div class="pattern-list">
+            {% for pattern in patterns %}
+
+            {# Highlight the card whose configuration panel is open. #}
+            <article class="pattern-card catalog-detail-card
+                    {{ 'selected' if selected_pattern and selected_pattern.id == pattern.id else '' }}">
+                <!-- The icon fills the existing 54px grid column. -->
+                <div class="pattern-icon" aria-hidden="true">
+                    {{ pattern.icon }}
+                </div>
+
+                <!-- This wrapper fills the remaining grid column. -->
+                <div>
+                    <h2 class="pattern-title">
+                        {{ pattern.name }}
+                    </h2>
+
+                    <p class="pattern-description">
+                        {{ pattern.description }}
+                    </p>
+
+                    <div class="pattern-footer">
+                        <!-- Render each technology tag as a small badge. -->
+                        <div class="tags">
+                            {% for tag in pattern.tags %}
+                            <span class="tag">{{ tag }}</span>
+                            {% endfor %}
+                        </div>
+
+                        <!--
+                                The pattern ID tells Flask which panel to open.
+                                The category keeps the current filter selected.
+                                The fragment moves the view to the panel.
+                            -->
+                        <a class="btn btn-primary" href="{{ url_for(
+                                    'home',
+                                    category=selected_category,
+                                    pattern=pattern.id,
+                                    _anchor='configuration-title'
+                                ) }}" aria-label="Kickstart {{ pattern.name }}">
+                            Kickstart →
+                        </a>
+                    </div>
+                </div>
+            </article>
+            {% else %}
+            <p>No patterns found.</p>
+            {% endfor %}
+        </div>
+    </section>
+
+    <!-- Right column: render the separate form template when selected. -->
+    {% if selected_pattern %}
+    {% include "_deployment_panel.html" %}
+    {% endif %}
+</div>
 {% endblock %}

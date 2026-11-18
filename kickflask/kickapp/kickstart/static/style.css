@@ -256,3 +256,68 @@ textarea:focus-visible { outline: 3px solid #80adff; outline-offset: 3px; }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { scroll-behavior: auto !important; transition: none !important; }
 }
+/* Before selection, the catalog occupies the available width. */
+.catalog-workspace {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 16px;
+    align-items: start;
+    padding-bottom: 20px;
+}
+
+/* After selection, display the catalog and form side by side. */
+.catalog-workspace.has-selection {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+}
+
+/* Add bottom padding to both panels inside this workspace. */
+.catalog-workspace > .catalog-panel,
+.catalog-workspace > .deployment-panel {
+    padding-bottom: 16px;
+}
+
+/* Allow long pattern names and tags to wrap within their grid column. */
+.catalog-detail-card > div {
+    min-width: 0;
+    overflow-wrap: anywhere;
+}
+
+/* Allow the tags and Kickstart link to wrap when space is limited. */
+.catalog-detail-card .pattern-footer {
+    flex-wrap: wrap;
+}
+
+/* Keep the selected panel heading visible when navigating to its anchor. */
+#configuration-title {
+    scroll-margin-top: 20px;
+}
+
+/* Shared spacing and border for validation and confirmation messages. */
+.configuration-message {
+    margin: 0 0 16px;
+    padding: 12px;
+    border: 1px solid;
+    border-radius: 8px;
+    line-height: 1.5;
+}
+
+/* Red indicates incomplete required fields. */
+.configuration-error {
+    color: #8c2020;
+    background: #fff0f0;
+    border-color: #edbcbc;
+}
+
+/* Green confirms that the form details were received. */
+.configuration-success {
+    color: #185b32;
+    background: #effbf3;
+    border-color: #b8dfc5;
+}
+
+/* On narrower screens, place the form below the catalog. */
+@media (max-width: 1050px) {
+    .catalog-workspace.has-selection {
+        grid-template-columns: minmax(0, 1fr);
+    }
+}
